@@ -7,9 +7,8 @@ const remainingGuessesSpan = document.querySelector(".remaining span"); // The s
 const message = document.querySelector(".message"); // The empty paragraph where messages will appear when the player guesses a letter.
 const playAgainButton = document.querySelector(".play-again"); // The hidden button that will appear prompting the player to play again.
 
-let word = "magnolia";
-// const word = "magnolia"; // For testing out the game
-const guessedLetters = []; // Will contain all the letters the player guesses
+let word = "magnolia"; // For testing out the game
+let guessedLetters = []; // Will contain all the letters the player guesses
 let remainingGuesses = 8; // Max number of guesses the player can make
 
 const getWord = async function () {
@@ -43,7 +42,7 @@ const placeholder = function (word) {
 // getWord(word);
 // placeholder(word);
 
-// Add event listener for when play clicks Guess button
+// Add event listener for when player clicks Guess button
 guessLetterButton.addEventListener("click", function (e) {
   e.preventDefault();
   // Empty message paragraph
@@ -72,7 +71,7 @@ const validateInput = function (input) {
     // Scenario 2 - Did you type more than one letter?
     message.innerText = "Please enter a single letter.";
   }
-  else if(!input.match(acceptedLetter)) { // Does the input not match regular expression pattern
+  else if(!input.match(acceptedLetter)) { // Does the input not match regular expression pattern?
     // Scenario 3 - Did you type a number, a special character or some other non letter thing?
     message.innerText = "Please enter a letter from A to Z.";
   }
@@ -147,6 +146,7 @@ const updateGuessesRemaining = function (guess) {
   if (remainingGuesses === 0) {
     message.innerHTML = `Game over! The word was <span class="highlight">${word}</span>.`;
     remainingGuessesSpan.innerText = `${remainingGuesses} guesses`;
+    startOver();
   }
   else if (remainingGuesses === 1) {
     remainingGuessesSpan.innerText = `${remainingGuesses} guess`;
@@ -161,5 +161,35 @@ const checkIfWin = function () {
   if (word.toUpperCase() === wordInProgress.innerText) {
     message.classList.add("win");
     message.innerHTML = '<p class="highlight">You guessed the correct word! Congrats!</p>';
+
+    startOver();
   }
 };
+
+// To hide and show elements needed for starting over the game
+const startOver = function () {
+  guessLetterButton.classList.add("hide");
+  remainingGuessesElement.classList.add("hide");
+  guessedLettersElement.classList.add("hide");
+  playAgainButton.classList.remove("hide");
+};
+
+// Add event listener for when player clicks Play Again button
+playAgainButton.addEventListener("click", function () {
+  // Reset all original values - grab new word
+  message.classList.remove("win");
+  guessedLetters = []; // Empty array containing player guesses
+  remainingGuesses = 8; // Reset remaining guesses back to 8
+  remainingGuessesSpan.innerText = `${remainingGuesses} guesses`; // Populate remaining guesses display with new amount of guesses
+  guessedLettersElement.innerHTML = ""; // Empty unordered list where guessed letters appear
+  message.innerText = ""; // Empty message paragraph
+
+  // Grab a new word to restart game
+  getWord();
+
+  // Show the right UI elements
+  guessLetterButton.classList.remove("hide"); // Show the Guess button
+  playAgainButton.classList.add("hide"); // Hide the Play Again button
+  remainingGuessesElement.classList.remove("hide"); // Show remaining guesses
+  guessedLettersElement.classList.remove("hide"); // Show the guessed letters
+});
